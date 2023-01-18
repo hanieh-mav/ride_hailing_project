@@ -6,3 +6,6 @@ SQLAlchemy==1.4.41
 psycopg2==2.9.5
 ujson==5.7.0
 redis==4.4.2
+waitress==2.1.2
+Flask-Injector==0.14.0
+python-dotenv==0.21.0
