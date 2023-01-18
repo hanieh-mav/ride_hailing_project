@@ -11,3 +11,6 @@ class RuntimeConfig:
     CACHE_HOST: str = ''
     CACHE_PORT: int = 0
     CACHE_DB_NUMBER: int = 0
+
+    FLASK_HOST: str = ''
+    FLASK_PORT: int = 0
