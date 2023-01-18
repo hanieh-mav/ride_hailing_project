@@ -48,6 +48,12 @@ class RequestThresholdCoefficientRepository(IRequestThresholdCoefficientReposito
             self.__cache_model_list(model_list)
             return model_list
 
+    def check_request_threshold_existence(self, request_threshold: int) -> bool:
+        with self.__database_connection.ms_sql_server_session() as session:
+            model = session.query(RequestThresholdCoefficientModel).filter(
+                RequestThresholdCoefficientModel.request_threshold == request_threshold).one_or_none()
+            return bool(model)
+
     def __remove_cached_model(self, pk: int) -> None:
         key: str = self.key_pattern.format(pk=pk)
         self.__cache_connection.remove_cached_data(key)

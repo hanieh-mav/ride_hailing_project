@@ -1,5 +1,7 @@
 from typing import Union
 
+from injector import inject
+
 from src.service.core.service_app_service_contract.repository.irequest_threshold_coefficient_repository import \
     IRequestThresholdCoefficientRepository
 from src.service.core.service_app_service_contract.service_app_service.irequest_threshold_coefficient_service import \
@@ -9,11 +11,14 @@ from src.service.core.service_model.request_threshold_coefficient_model import R
 
 class RequestThresholdCoefficientService(IRequestThresholdCoefficientService):
 
+    @inject
     def __init__(self, repository: IRequestThresholdCoefficientRepository) -> None:
         self.__repository = repository
 
     def add_request_threshold_coefficient(self, request_threshold: Union[int, None],
                                           price_coefficient: Union[int, float, None]):
+        if self.__repository.check_request_threshold_existence(request_threshold):
+            raise ValueError('This request threshold already exist')
         model = \
             RequestThresholdCoefficientModel(request_threshold=request_threshold, price_coefficient=price_coefficient)
         self.__repository.add(model)

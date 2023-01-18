@@ -20,3 +20,7 @@ class IRequestThresholdCoefficientRepository(ABC):
     @abstractmethod
     def get_all_model_list(self) -> list[RequestThresholdCoefficientModel]:
         raise NotImplementedError
+
+
+    def check_request_threshold_existence(self,request_threshold:int)->bool:
+        raise NotImplementedError
