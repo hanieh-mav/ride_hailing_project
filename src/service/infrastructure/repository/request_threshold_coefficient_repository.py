@@ -12,6 +12,7 @@ from src.service.core.service_model.request_threshold_coefficient_model import R
 class RequestThresholdCoefficientRepository(IRequestThresholdCoefficientRepository):
     key_pattern: str = 'cache:request_threshold_coefficient:{pk}'
     key_pattern_list: str = 'cache:request_threshold_coefficient_list'
+    request_threshold_key_pattern: str = 'cache:request_threshold_coefficient:{request_threshold}'
 
     @inject
     def __init__(self, database_connection: IDatabaseConnection, cache_connection: ICacheConnection) -> None:
@@ -54,6 +55,17 @@ class RequestThresholdCoefficientRepository(IRequestThresholdCoefficientReposito
                 RequestThresholdCoefficientModel.request_threshold == request_threshold).one_or_none()
             return bool(model)
 
+    def get_price_coefficient_by_request_threshold(self, request_threshold: int) -> Union[int, float, None]:
+        if cached_price_coefficient := self.__get_cached_price_coefficient_with_request_threshold(request_threshold):
+            return cached_price_coefficient
+        with self.__database_connection.ms_sql_server_session() as session:
+            if model := \
+                    session.query(RequestThresholdCoefficientModel).filter(
+                        RequestThresholdCoefficientModel.request_threshold == request_threshold).one_or_none():
+                price_coefficient: Union[int, float] = model.price_coefficient
+                self.__cache_price_coefficient_with_request_threshold(request_threshold,price_coefficient)
+                return price_coefficient
+
     def __remove_cached_model(self, pk: int) -> None:
         key: str = self.key_pattern.format(pk=pk)
         self.__cache_connection.remove_cached_data(key)
@@ -74,3 +86,13 @@ class RequestThresholdCoefficientRepository(IRequestThresholdCoefficientReposito
     def __get_cached_model_list(self) -> list[RequestThresholdCoefficientModel]:
         if data_list := self.__cache_connection.get_cached_data(self.key_pattern_list):
             return [RequestThresholdCoefficientModel(**data) for data in data_list]
+
+    def __get_cached_price_coefficient_with_request_threshold(self, request_threshold: int) -> Union[None, int, float]:
+        key = self.request_threshold_key_pattern.format(request_threshold=request_threshold)
+        if data := self.__cache_connection.get_cached_data(key):
+            return data
+
+    def __cache_price_coefficient_with_request_threshold(self, request_threshold: int,
+                                                         price_coefficient: Union[int, float]) -> None:
+        key = self.request_threshold_key_pattern.format(request_threshold=request_threshold)
+        self.__cache_connection.cache_data(key, price_coefficient)
