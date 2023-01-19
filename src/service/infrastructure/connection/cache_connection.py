@@ -1,4 +1,4 @@
-from typing import  Union
+from typing import Union
 
 import redis
 import ujson
@@ -13,11 +13,11 @@ class CacheConnection(ICacheConnection):
         self.__connection = redis.Redis(host=RuntimeConfig.CACHE_HOST, port=RuntimeConfig.CACHE_PORT,
                                         db=RuntimeConfig.CACHE_DB_NUMBER)
 
-    def cache_data(self, key: str, value: Union[dict, list[dict]]) -> None:
+    def cache_data(self, key: str, value: Union[dict, list[dict], int]) -> None:
         data: str = ujson.dumps(value)
         self.__connection.set(key, data)
 
-    def get_cached_data(self, key: str) -> Union[None, dict, list[dict]]:
+    def get_cached_data(self, key: str) -> Union[None, dict, list[dict], int]:
         if result := self.__connection.get(key):
             return ujson.loads(result)
 
