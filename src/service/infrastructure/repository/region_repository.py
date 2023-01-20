@@ -25,6 +25,7 @@ class RegionRepository(IRegionRepository):
             session.refresh(model)
             session.expunge_all()
             self.__cache_region_id(model.id, model.place_id)
+            self.__remove_cached_id_list()
 
     def get_all_region_id_list(self) -> list[int]:
         if cached_id_list := self.__get_cached_id_list():
@@ -59,3 +60,6 @@ class RegionRepository(IRegionRepository):
     def __get_cached_id_list(self) -> list[int]:
         if id_list := self.__cache_connection.get_cached_data(self.key_pattern_for_list):
             return id_list
+
+    def __remove_cached_id_list(self) -> None:
+        self.__cache_connection.remove_cached_data(self.key_pattern_for_list)
