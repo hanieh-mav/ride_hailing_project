@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Integer, Float
 
-from src.service.core.service_model import Base
+from src.service.core.service_model.base import Base
 
 
 class RequestThresholdCoefficientModel(Base):

@@ -2,7 +2,8 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Integer, Float, ForeignKey
 
-from src.service.core.service_model import Base, RegionModel
+from src.service.core.service_model import RegionModel
+from src.service.core.service_model.base import Base
 
 
 class RegionPriceCoefficientModel(Base):
@@ -15,4 +16,3 @@ class RegionPriceCoefficientModel(Base):
     last_modified_date = Column('LastModifiedDate', DateTime, default=datetime.now(timezone.utc),
                                 onupdate=datetime.now(timezone.utc))
     entry_date = Column('EntryDate', DateTime, default=datetime.now(timezone.utc))
-

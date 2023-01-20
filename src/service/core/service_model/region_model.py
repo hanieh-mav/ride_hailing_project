@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, Integer, NVARCHAR
 from sqlalchemy.orm import relationship
 
-from src.service.core.service_model import Base
+from src.service.core.service_model.base import Base
 
 
 class RegionModel(Base):
