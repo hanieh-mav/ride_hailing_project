@@ -11,6 +11,8 @@ from src.service.config.runtime_config import RuntimeConfig
 from flask_injector import FlaskInjector
 
 from src.service.core.service_app_service.price_coefficient_service import PriceCoefficientService
+from src.service.core.service_app_service.region_price_coefficient_calculator_service import \
+    RegionPriceCoefficientCalculatorService
 from src.service.core.service_app_service.region_request_service import RegionRequestService
 from src.service.core.service_app_service.request_threshold_coefficient_service import \
     RequestThresholdCoefficientService
@@ -28,6 +30,8 @@ from src.service.core.service_app_service_contract.repository.irequest_threshold
     IRequestThresholdCoefficientRepository
 from src.service.core.service_app_service_contract.service_app_service.iprice_coefficient_service import \
     IPriceCoefficientService
+from src.service.core.service_app_service_contract.service_app_service.iregion_price_coefficient_calculator_service import \
+    IRegionPriceCoefficientCalculatorService
 from src.service.core.service_app_service_contract.service_app_service.iregion_request_service import \
     IRegionRequestService
 from src.service.core.service_app_service_contract.service_app_service.irequest_threshold_coefficient_service import \
@@ -62,6 +66,7 @@ injector.binder.bind(IRegionRequestRepository, RegionRequestRepository)
 injector.binder.bind(IRequestThresholdCoefficientService, RequestThresholdCoefficientService)
 injector.binder.bind(IPriceCoefficientService, PriceCoefficientService)
 injector.binder.bind(IRegionRequestService, RegionRequestService)
+# injector.binder.bind(IRegionPriceCoefficientCalculatorService, RegionPriceCoefficientCalculatorService)
 
 app = Flask(__name__)
 api = Api(app)
@@ -89,4 +94,6 @@ def start_service():
 if __name__ == '__main__':
     BaseConfig.configure(RuntimeConfig)
     logging.basicConfig(level=logging.DEBUG)
-    cli()
+    # cli()
+    pre = injector.get(RegionPriceCoefficientCalculatorService)
+    pre.calculate_price_coefficient()
