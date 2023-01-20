@@ -11,6 +11,7 @@ from src.service.core.service_model.region_model import RegionModel
 
 class RegionRepository(IRegionRepository):
     key_pattern: str = 'cache:region_id:{place_id}'
+    key_pattern_for_list: str = 'cache:region_id_list'
 
     @inject
     def __init__(self, database_connection: IDatabaseConnection, cache_connection: ICacheConnection) -> None:
@@ -24,6 +25,15 @@ class RegionRepository(IRegionRepository):
             session.refresh(model)
             session.expunge_all()
             self.__cache_region_id(model.id, model.place_id)
+
+    def get_all_region_id_list(self) -> list[int]:
+        if cached_id_list := self.__get_cached_id_list():
+            return cached_id_list
+        with self.__database_connection.ms_sql_server_session() as session:
+            if id_tuple_list := session.query(RegionModel).all():
+                id_list: list[int] = [id_tuple[0] for id_tuple in id_tuple_list]
+                self.__cache_id_list(id_list)
+                return id_list
 
     def get_id_by_place_id(self, place_id: int) -> Union[int, None]:
         if cached_id := self.__get_cached_region_id(place_id):
@@ -42,3 +52,10 @@ class RegionRepository(IRegionRepository):
     def __cache_region_id(self, region_id: int, place_id: int):
         key = self.key_pattern.format(place_id=place_id)
         self.__cache_connection.cache_data(key, region_id)
+
+    def __cache_id_list(self, id_list: list[int]):
+        self.__cache_connection.cache_data(self.key_pattern_for_list, id_list)
+
+    def __get_cached_id_list(self) -> list[int]:
+        if id_list := self.__cache_connection.get_cached_data(self.key_pattern_for_list):
+            return id_list

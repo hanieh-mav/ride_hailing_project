@@ -13,3 +13,7 @@ class IRegionRepository(ABC):
     @abstractmethod
     def add(self, model: RegionModel) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    def get_all_region_id_list(self) -> list[int]:
+        raise NotImplementedError
