@@ -1,9 +1,12 @@
 import logging
 
+from apscheduler.triggers.cron import CronTrigger
 from injector import Injector
 
 from flask import Flask
 from flask_restful import Api
+from sqlalchemy_utils import database_exists, create_database
+from waitress import serve
 
 from src.service.config.base_config import BaseConfig
 from src.service.config.runtime_config import RuntimeConfig
@@ -30,12 +33,11 @@ from src.service.core.service_app_service_contract.repository.irequest_threshold
     IRequestThresholdCoefficientRepository
 from src.service.core.service_app_service_contract.service_app_service.iprice_coefficient_service import \
     IPriceCoefficientService
-from src.service.core.service_app_service_contract.service_app_service.iregion_price_coefficient_calculator_service import \
-    IRegionPriceCoefficientCalculatorService
 from src.service.core.service_app_service_contract.service_app_service.iregion_request_service import \
     IRegionRequestService
 from src.service.core.service_app_service_contract.service_app_service.irequest_threshold_coefficient_service import \
     IRequestThresholdCoefficientService
+from src.service.core.service_model.base import Base
 from src.service.infrastructure.connection.cache_connection import CacheConnection
 from src.service.infrastructure.connection.database_connection import DatabaseConnection
 from src.service.infrastructure.connection.message_publisher_connection import MessagePublisherConnection
@@ -66,7 +68,6 @@ injector.binder.bind(IRegionRequestRepository, RegionRequestRepository)
 injector.binder.bind(IRequestThresholdCoefficientService, RequestThresholdCoefficientService)
 injector.binder.bind(IPriceCoefficientService, PriceCoefficientService)
 injector.binder.bind(IRegionRequestService, RegionRequestService)
-# injector.binder.bind(IRegionPriceCoefficientCalculatorService, RegionPriceCoefficientCalculatorService)
 
 app = Flask(__name__)
 api = Api(app)
@@ -80,20 +81,58 @@ def cli():
     pass
 
 
-@cli.command()
-def start_process():
+def start_trace_message_process():
     process = injector.get(TraceMessageHandler)
     process.trace_message()
 
 
+def start_calculator_process():
+    process = injector.get(RegionPriceCoefficientCalculatorService)
+    from apscheduler.schedulers.blocking import BlockingScheduler
+    scheduler = BlockingScheduler()
+    scheduler.add_job(func=process.calculate_price_coefficient,
+                      trigger=get_cron_trigger_from_string_expression(
+                          RuntimeConfig.SCHEDULED_TIME_FOR_CALCULATOR_PROCESS)
+                      )
+
+    scheduler.start()
+
+
+def get_cron_trigger_from_string_expression(string_expression: str) -> CronTrigger:
+    vals = string_expression.split()
+    vals = [(None if w == '?' else w) for w in vals]
+    return CronTrigger(year=vals[0], month=vals[1], week=vals[2], day=vals[3], hour=vals[4], minute=vals[5],
+                       second=vals[6])
+
+
+def start_rest_service():
+    serve(app, host=RuntimeConfig.FLASK_HOST, port=RuntimeConfig.FLASK_PORT)
+
+
 @cli.command()
 def start_service():
-    app.run(debug=True)
+    from concurrent.futures import ProcessPoolExecutor
+    with ProcessPoolExecutor() as executor:
+        executor.submit(start_rest_service)
+        executor.submit(start_calculator_process)
+        executor.submit(start_trace_message_process)
+
+
+def creat_database():
+    database = injector.get(DatabaseConnection)
+    engine = database.engine
+    if not database_exists(engine.url):
+        create_database(engine.url)
+
+        connection = engine.connect()
+        schema_query = 'create schema "ride.hailing"'
+        connection.execute(schema_query)
+        Base.metadata.create_all(engine)
 
 
 if __name__ == '__main__':
     BaseConfig.configure(RuntimeConfig)
     logging.basicConfig(level=logging.DEBUG)
-    # cli()
-    pre = injector.get(RegionPriceCoefficientCalculatorService)
-    pre.calculate_price_coefficient()
+    creat_database()
+
+    cli()

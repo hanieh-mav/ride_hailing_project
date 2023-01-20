@@ -34,7 +34,8 @@ class RequestThresholdCoefficientService(IRequestThresholdCoefficientService):
 
     def get_request_threshold_coefficient_by_pk(self, pk: str) -> dict:
         int_pk: int = int(pk)
-        return self.__repository.get_model_by_pk(int_pk).make_dict_data()
+        if model := self.__repository.get_model_by_pk(int_pk):
+            return model.make_dict_data()
 
     def get_all_request_threshold_coefficient_list(self) -> list[dict]:
         model_list: list[RequestThresholdCoefficientModel] = self.__repository.get_all_model_list()

@@ -31,6 +31,7 @@ class RequestThresholdCoefficientRepository(IRequestThresholdCoefficientReposito
                  RequestThresholdCoefficientModel.price_coefficient: model.price_coefficient}
             )
             self.__remove_cached_model(model.id)
+            self.__cache_connection.remove_cached_data(self.key_pattern_list)
 
     def get_model_by_pk(self, pk: int) -> RequestThresholdCoefficientModel:
         if cached_model := self.__get_cached_model(pk):
@@ -63,7 +64,7 @@ class RequestThresholdCoefficientRepository(IRequestThresholdCoefficientReposito
                     session.query(RequestThresholdCoefficientModel).filter(
                         RequestThresholdCoefficientModel.request_threshold == request_threshold).one_or_none():
                 price_coefficient: Union[int, float] = model.price_coefficient
-                self.__cache_price_coefficient_with_request_threshold(request_threshold,price_coefficient)
+                self.__cache_price_coefficient_with_request_threshold(request_threshold, price_coefficient)
                 return price_coefficient
 
     def __remove_cached_model(self, pk: int) -> None:

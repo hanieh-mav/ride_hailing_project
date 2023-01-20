@@ -5,15 +5,17 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, URL
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy_utils import database_exists, create_database
 
 from src.service.config.runtime_config import RuntimeConfig
 from src.service.core.service_app_service_contract.connection.idatabase_connection import IDatabaseConnection
+from src.service.core.service_model.base import Base
 
 
 class DatabaseConnection(IDatabaseConnection):
 
     def __init__(self) -> None:
-        self.__engine: Engine = self.__create_engine()
+        self.engine: Engine = self.__create_engine()
 
     @staticmethod
     def __create_engine() -> Engine:
@@ -26,7 +28,7 @@ class DatabaseConnection(IDatabaseConnection):
                              max_overflow=RuntimeConfig.DATABASE_MAX_OVERFLOW)
 
     def __session_maker(self) -> sessionmaker:
-        return sessionmaker(self.__engine)
+        return sessionmaker(self.engine)
 
     def ms_sql_server_session(self, has_transaction: bool = None) -> Session:
         session_factory = self.__session_maker()

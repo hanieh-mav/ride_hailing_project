@@ -25,3 +25,7 @@ class RuntimeConfig:
     KAFKA_AUTO_OFFSET_RESET: str = ""
     KAFKA_TOPIC_LIST: list[str] = []
     KAFKA_CONSUMER_GROUP_ID: str = ''
+
+    SCHEDULED_TIME_FOR_CALCULATOR_PROCESS: str = ''
+
+
