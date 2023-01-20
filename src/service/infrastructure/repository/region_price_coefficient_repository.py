@@ -45,8 +45,8 @@ class RegionPriceCoefficientRepository(IRegionPriceCoefficientRepository):
 
     def update(self, model: RegionPriceCoefficientModel) -> None:
         with self.__database_connection.ms_sql_server_session(has_transaction=True) as session:
-            session.query(RegionPriceCoefficientModel).filter(RegionModel.id == model.id).update({
-                RegionPriceCoefficientModel.price_coefficient == model.price_coefficient
+            session.query(RegionPriceCoefficientModel).filter(RegionPriceCoefficientModel.id == model.id).update({
+                RegionPriceCoefficientModel.price_coefficient: model.price_coefficient
             })
             region_id: int = model.region_id
             self.__remove_cached_price_coefficient(region_id)
