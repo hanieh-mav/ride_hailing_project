@@ -15,8 +15,13 @@ class RuntimeConfig:
     FLASK_HOST: str = ''
     FLASK_PORT: int = 0
 
-    KAFKA_BROKERS_LIST: list[str] = ['']
+    KAFKA_BROKERS_LIST: list[str] = []
     KAFKA_USER_NAME: str = ''
     KAFKA_PASSWORD: str = ''
     KAFKA_CERT_PEM: str = ''
     KAFKA_TOPIC: str = ''
+
+    KAFKA_SESSION_TIMEOUT_MS: int = 0
+    KAFKA_AUTO_OFFSET_RESET: str = ""
+    KAFKA_TOPIC_LIST: list[str] = []
+    KAFKA_CONSUMER_GROUP_ID: str = ''
