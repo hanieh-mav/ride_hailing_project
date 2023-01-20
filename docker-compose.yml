@@ -58,6 +58,8 @@ services:
       context: .
       dockerfile: Dockerfile
     command: python manage.py start-service
+    ports:
+      - "8000:8000"
     environment:
       DATABASE_DRIVER_NAME: 'postgresql+psycopg2'
       DATABASE_USERNAME: 'postgres'
