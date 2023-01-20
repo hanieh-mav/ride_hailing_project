@@ -31,7 +31,7 @@ class RegionRepository(IRegionRepository):
         if cached_id_list := self.__get_cached_id_list():
             return cached_id_list
         with self.__database_connection.ms_sql_server_session() as session:
-            if id_tuple_list := session.query(RegionModel).all():
+            if id_tuple_list := session.query(RegionModel.id).all():
                 id_list: list[int] = [id_tuple[0] for id_tuple in id_tuple_list]
                 self.__cache_id_list(id_list)
                 return id_list
