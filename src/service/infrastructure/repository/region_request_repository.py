@@ -13,4 +13,4 @@ class RegionRequestRepository(IRegionRequestRepository):
 
     def add(self, model: RegionRequestModel) -> None:
         with self.__database_connection.ms_sql_server_session(has_transaction=True) as session:
-            session.add(RegionRequestModel)
+            session.add(model)

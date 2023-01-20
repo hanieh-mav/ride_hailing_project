@@ -20,6 +20,9 @@ class RegionRepository(IRegionRepository):
     def add(self, model: RegionModel) -> None:
         with self.__database_connection.ms_sql_server_session(has_transaction=True) as session:
             session.add(model)
+            session.flush()
+            session.refresh(model)
+            session.expunge_all()
             self.__cache_region_id(model.id, model.place_id)
 
     def get_id_by_place_id(self, place_id: int) -> Union[int, None]:

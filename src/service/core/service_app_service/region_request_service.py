@@ -19,16 +19,16 @@ class RegionRequestService(IRegionRequestService):
     def save_request_for_region(self, place_id: str) -> None:
         int_place_id: int = int(place_id)
         if region_id := self.__region_repository.get_id_by_place_id(int_place_id):
-            self.__add_region(int_place_id)
-        else:
             self.__add_request_for_region(region_id)
+        else:
+            self.__add_region(int_place_id)
 
     def __add_request_for_region(self, region_id: int) -> None:
         model: RegionRequestModel = RegionRequestModel(region_id=region_id)
         self.__request_region_repository.add(model)
 
     def __add_region(self, place_id: int):
-        region_model: RegionModel = RegionModel(place_id=place_id)
+        region_model: RegionModel = RegionModel(place_id=place_id, name='Tehran')
         region_request_model: RegionRequestModel = RegionRequestModel()
         region_model.region_request.append(region_request_model)
         self.__region_repository.add(region_model)
