@@ -4,10 +4,11 @@ import logging
 from confluent_kafka import Consumer
 
 from src.service.config.runtime_config import RuntimeConfig
-from src.service.core.service_app_service_contract.connection.imessage_receiver_connection import IMessageReceiver
+from src.service.core.service_app_service_contract.connection.imessage_receiver_connection import \
+    IMessageReceiverConnection
 
 
-class MessageReceiver(IMessageReceiver):
+class MessageReceiverConnection(IMessageReceiverConnection):
 
     def __init__(self) -> None:
         self.__broker_list: list[str] = RuntimeConfig.KAFKA_BROKERS_LIST

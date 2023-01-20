@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class IMessageReceiver(ABC):
+class IMessageReceiverConnection(ABC):
 
     @abstractmethod
     def receive(self) -> str:
