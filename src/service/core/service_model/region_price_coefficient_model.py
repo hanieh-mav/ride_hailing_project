@@ -2,8 +2,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Integer, Float, ForeignKey
 
-from src.service.core.service_model import Base
-from src.service.core.service_model.region_model import RegionModel
+from src.service.core.service_model import Base, RegionModel
 
 
 class RegionPriceCoefficientModel(Base):

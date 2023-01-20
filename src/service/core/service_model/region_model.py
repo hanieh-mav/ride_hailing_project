@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Integer, NVARCHAR
+from sqlalchemy.orm import relationship
 
 from src.service.core.service_model import Base
 
@@ -15,3 +16,5 @@ class RegionModel(Base):
     last_modified_date = Column('LastModifiedDate', DateTime, default=datetime.now(timezone.utc),
                                 onupdate=datetime.now(timezone.utc))
     entry_date = Column('EntryDate', DateTime, default=datetime.now(timezone.utc))
+
+    region_request = relationship('RegionRequestModel', back_populates="region")

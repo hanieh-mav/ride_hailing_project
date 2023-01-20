@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, BigInteger, ForeignKey
+from sqlalchemy.orm import relationship
 
-from src.service.core.service_model import Base
-from src.service.core.service_model.region_model import RegionModel
+from src.service.core.service_model import Base, RegionModel
 
 
 class RegionRequestModel(Base):
@@ -13,3 +13,5 @@ class RegionRequestModel(Base):
     id = Column('Id', BigInteger, primary_key=True)
     region_id = Column('RegionId', ForeignKey(RegionModel.id))
     entry_date = Column('EntryDate', DateTime, default=datetime.now(timezone.utc))
+
+    region = relationship('RegionModel', back_populates="region_request")
